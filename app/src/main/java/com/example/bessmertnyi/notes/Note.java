@@ -6,6 +6,11 @@ public class Note {
     private Drawable image;
     private CharSequence mainText;
 
+    public Note(Drawable image, CharSequence mainText) {
+        this.image = image;
+        this.mainText = mainText;
+    }
+
     public CharSequence getMainText() {
         return mainText;
     }

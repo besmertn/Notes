@@ -8,9 +8,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 public class MainActivity extends AppCompatActivity {
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerView notesRecyclerView;
+    private NoteAdapter notesAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
@@ -20,12 +23,16 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        mRecyclerView = findViewById(R.id.my_recycler_view);
+        notesRecyclerView = findViewById(R.id.my_recycler_view);
 
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        notesRecyclerView.setLayoutManager(mLayoutManager);
+        notesAdapter = new NoteAdapter();
+        notesRecyclerView.setAdapter(notesAdapter);
+
+        loadNotes();
 
     }
 
@@ -49,6 +56,19 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    private void loadNotes() {
+        Collection<Note> notes = getNotes();
+        notesAdapter.setItems(notes);
+    }
+
+    private Collection<Note> getNotes(){
+        return Arrays.asList(
+                new Note(this.getDrawable(android.R.drawable.ic_secure), "Note number1"),
+                new Note(this.getDrawable(android.R.drawable.ic_secure), "Note number2"),
+                new Note(this.getDrawable(android.R.drawable.ic_secure), "Note number3")
+        );
     }
 
 }
