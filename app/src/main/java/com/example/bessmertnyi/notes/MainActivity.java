@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,7 +31,19 @@ public class MainActivity extends AppCompatActivity {
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         notesRecyclerView.setLayoutManager(mLayoutManager);
-        notesAdapter = new NoteAdapter();
+
+        OnNoteClickListener listener = new OnNoteClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                CharSequence text = "Position !" + position;
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(getApplicationContext(), text, duration);
+                toast.show();
+            }
+        };
+
+        notesAdapter = new NoteAdapter(listener);
         notesRecyclerView.setAdapter(notesAdapter);
 
         loadNotes();

@@ -14,13 +14,24 @@ import java.util.List;
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     private List<Note> values = new ArrayList<>();
 
-    class NoteViewHolder extends RecyclerView.ViewHolder {
+    public NoteAdapter(OnNoteClickListener listener) {
+        this.listener = listener;
+    }
+
+    private OnNoteClickListener listener;
+
+
+    class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mainTextView;
         private ImageView mainImageView;
 
-        public NoteViewHolder(View itemView) {
+        private OnNoteClickListener listener;
+
+        public NoteViewHolder(View itemView, OnNoteClickListener listener) {
             super(itemView);
+            this.listener = listener;
+            itemView.setOnClickListener(this);
             mainTextView = itemView.findViewById(R.id.mainTextView);
             mainImageView = itemView.findViewById(R.id.mainImageView);
         }
@@ -29,19 +40,23 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             mainTextView.setText(note.getMainText());
             mainImageView.setImageDrawable(note.getImage());
         }
+
+        @Override
+        public void onClick(View view) {
+            listener.onClick(view, getAdapterPosition());
+        }
     }
 
     @Override
     public NoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.note_view, parent, false);
-        return new NoteViewHolder(v);
+        return new NoteViewHolder(v, listener);
     }
 
     @Override
     public void onBindViewHolder(NoteViewHolder holder, int position) {
         holder.bind(values.get(position));
-
     }
 
     @Override
@@ -54,7 +69,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         notifyDataSetChanged();
     }
 
-    public void vlearItems() {
+    public void clearItems() {
         values.clear();
         notifyDataSetChanged();
     }
