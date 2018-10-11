@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
@@ -47,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         notesRecyclerView.setAdapter(notesAdapter);
 
         loadNotes();
-
     }
 
     @Override
