@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         notesAdapter = new NoteAdapter(listener);
         notesRecyclerView.setAdapter(notesAdapter);
 
-        loadNotes();
+        //loadNotes();
     }
 
     @Override
@@ -82,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
         //super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == CREATE_NEW_NOTE) {
             if(data == null) {return;}
-            Note note = new Note(this.getDrawable(android.R.drawable.ic_secure), data.getStringExtra("mainText"));
+            Note note = new Note(this.getDrawable(android.R.drawable.ic_secure),
+                    data.getStringExtra("mainText"),
+                    data.getStringExtra("dateTime"));
             notesAdapter.setItems(note);
         }
     }
@@ -94,9 +96,15 @@ public class MainActivity extends AppCompatActivity {
 
     private Collection<Note> getNotes(){
         return Arrays.asList(
-                new Note(this.getDrawable(android.R.drawable.ic_secure), "Note number1"),
-                new Note(this.getDrawable(android.R.drawable.ic_secure), "Note number2"),
-                new Note(this.getDrawable(android.R.drawable.ic_secure), "Note number3")
+                new Note(this.getDrawable(android.R.drawable.ic_secure),
+                        "Note number1",
+                        "da"),
+                new Note(this.getDrawable(android.R.drawable.ic_secure),
+                        "Note number2",
+                        "da"),
+                new Note(this.getDrawable(android.R.drawable.ic_secure),
+                        "Note number3",
+                        "da")
         );
     }
 

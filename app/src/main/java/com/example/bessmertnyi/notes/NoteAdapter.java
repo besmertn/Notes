@@ -24,7 +24,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mainTextView;
+        private TextView dateTimeTextView;
         private ImageView mainImageView;
+
 
         private OnNoteClickListener listener;
 
@@ -33,11 +35,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             this.listener = listener;
             itemView.setOnClickListener(this);
             mainTextView = itemView.findViewById(R.id.mainTextView);
+            dateTimeTextView = itemView.findViewById(R.id.dateTimeTextView);
             mainImageView = itemView.findViewById(R.id.mainImageView);
         }
 
         public void bind(Note note) {
-            mainTextView.setText(note.getMainText());
+            mainTextView.setText(note.getShortText());
+            dateTimeTextView.setText(note.getDateTime());
             mainImageView.setImageDrawable(note.getImage());
         }
 

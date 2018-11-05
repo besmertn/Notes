@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class NoteCreationActivity extends AppCompatActivity {
 
-    TextView currentDateTimeEditText;
+    TextView currentDateTimeTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,18 +26,19 @@ public class NoteCreationActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 EditText mainEditText = findViewById(R.id.mainTextEditText);
                 intent.putExtra("mainText", mainEditText.getText().toString());
+                intent.putExtra("dateTime", currentDateTimeTextView.getText().toString());
                 setResult(RESULT_OK, intent);
                 finish();
             }
         });
 
-        currentDateTimeEditText =  findViewById(R.id.currentDaeTimeTextView);
+        currentDateTimeTextView =  findViewById(R.id.currentDaeTimeTextView);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        currentDateTimeEditText.setText(currentDateTimeString);
+        currentDateTimeTextView.setText(currentDateTimeString);
     }
 }
