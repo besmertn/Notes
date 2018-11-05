@@ -11,13 +11,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
     private static final int CREATE_NEW_NOTE = 1;
+    private static final int EDIT_NOTE = 2;
+    private int selectedNotePosition;
     private RecyclerView notesRecyclerView;
     private NoteAdapter notesAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -40,11 +41,12 @@ public class MainActivity extends AppCompatActivity {
         OnNoteClickListener listener = new OnNoteClickListener() {
             @Override
             public void onClick(View view, int position) {
-                CharSequence text = "Position !" + position;
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(getApplicationContext(), text, duration);
-                toast.show();
+                selectedNotePosition = position;
+                Intent intent = new Intent(MainActivity.this,
+                                                         NoteCreationActivity.class);
+                intent.putExtra("mainText", notesAdapter.getNote(position).getMainText());
+                intent.putExtra("dateTime", notesAdapter.getNote(position).getDateTime());
+                startActivityForResult(intent, EDIT_NOTE);
             }
         };
 
@@ -86,6 +88,12 @@ public class MainActivity extends AppCompatActivity {
                     data.getStringExtra("mainText"),
                     data.getStringExtra("dateTime"));
             notesAdapter.setItems(note);
+        }
+        if (resultCode == Activity.RESULT_OK && requestCode == EDIT_NOTE) {
+            if(data == null) {return;}
+            Note selectedNote = notesAdapter.getNote(selectedNotePosition);
+            selectedNote.setMainText(data.getStringExtra("mainText"));
+            selectedNote.setDateTime(data.getStringExtra("dateTime"));
         }
     }
 

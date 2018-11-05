@@ -14,11 +14,17 @@ import java.util.Date;
 public class NoteCreationActivity extends AppCompatActivity {
 
     TextView currentDateTimeTextView;
+    EditText mainTextEditText;
+    private  String dateTime;
+    private  String mainText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_creation);
+
+        dateTime = this.getIntent().getStringExtra("dateTime");
+        mainText = this.getIntent().getStringExtra("mainText");
 
         final ImageButton button = findViewById(R.id.backImageButton);
         button.setOnClickListener(new View.OnClickListener() {
@@ -26,19 +32,31 @@ public class NoteCreationActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 EditText mainEditText = findViewById(R.id.mainTextEditText);
                 intent.putExtra("mainText", mainEditText.getText().toString());
-                intent.putExtra("dateTime", currentDateTimeTextView.getText().toString());
+                if((dateTime != null && !mainText.equals(mainTextEditText.getText().toString())) || dateTime == null) {
+                    intent.putExtra("dateTime", currentDateTimeTextView.getText().toString());
+                } else {
+                    intent.putExtra("dateTime", dateTime);
+                }
+
                 setResult(RESULT_OK, intent);
                 finish();
             }
         });
 
         currentDateTimeTextView =  findViewById(R.id.currentDaeTimeTextView);
+        mainTextEditText = findViewById(R.id.mainTextEditText);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        currentDateTimeTextView.setText(currentDateTimeString);
+        if(dateTime == null) {
+            currentDateTimeTextView.setText(currentDateTimeString);
+        } else {
+            currentDateTimeTextView.setText(dateTime);
+            mainTextEditText.setText(mainText);
+        }
+
     }
 }

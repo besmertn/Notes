@@ -34,6 +34,19 @@ public class Note {
 
     public void setMainText(CharSequence mainText) {
         this.mainText = mainText;
+        String[] lines = mainText.toString().split("\r\n|\r|\n");
+        if(mainText.length() > 40 || lines.length > 2) {
+            if(lines.length > 2) {
+                String shortStr = lines[0] + "\r\n" + lines[1] + "...";
+                this.shortText = shortStr;
+            } else {
+                this.shortText = mainText.subSequence(0, 40) + "...";
+            }
+
+        } else {
+            shortText = mainText;
+        }
+
     }
 
     public Drawable getImage() {
