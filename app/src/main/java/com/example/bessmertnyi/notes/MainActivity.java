@@ -1,6 +1,9 @@
 package com.example.bessmertnyi.notes;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int CREATE_NEW_NOTE = 1;
     private RecyclerView notesRecyclerView;
     private NoteAdapter notesAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -61,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
+                Intent intent = new Intent(this, NoteCreationActivity.class);
+                startActivityForResult(intent, CREATE_NEW_NOTE);
                 return true;
 
             default:
@@ -69,6 +74,16 @@ public class MainActivity extends AppCompatActivity {
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
 
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && requestCode == CREATE_NEW_NOTE) {
+            if(data == null) {return;}
+            Note note = new Note(this.getDrawable(android.R.drawable.ic_secure), data.getStringExtra("mainText"));
+            notesAdapter.setItems(note);
         }
     }
 

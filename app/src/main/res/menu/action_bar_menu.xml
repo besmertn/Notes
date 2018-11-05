@@ -6,7 +6,8 @@
         <!-- Settings, should always be in the overflow -->
         <item android:id="@+id/action_settings"
             android:icon="@drawable/ic_more"
-            app:showAsAction="never" >
+            app:showAsAction="never"
+            android:title="New Note">
         </item>
 
 </menu>

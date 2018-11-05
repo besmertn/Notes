@@ -69,6 +69,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         notifyDataSetChanged();
     }
 
+    public void setItems(Note note) {
+        values.add(note);
+        notifyDataSetChanged();
+    }
+
     public void clearItems() {
         values.clear();
         notifyDataSetChanged();
