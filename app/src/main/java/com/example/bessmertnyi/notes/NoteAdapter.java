@@ -45,6 +45,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             mainTextView.setText(note.getShortText());
             dateTimeTextView.setText(note.getDateTime());
             byte[] imageBytes = note.getImage();
+            System.out.println(imageBytes);
             Bitmap bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             mainImageView.setImageBitmap(bmp);
         }

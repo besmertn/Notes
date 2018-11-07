@@ -12,6 +12,7 @@ public class Note implements Parcelable{
 
     public Note(byte[] image, CharSequence mainText, CharSequence dateTime) {
         this.image = image;
+        System.out.println(image);
         this.dateTime = dateTime;
         this.mainText = mainText;
         String[] lines = mainText.toString().split("\r\n|\r|\n");

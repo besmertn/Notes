@@ -115,7 +115,8 @@ public class MainActivity extends AppCompatActivity {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
-            Note note = new Note(byteArray,
+            System.out.println(byteArray);
+            Note note = new Note(data.getByteArrayExtra("image"),
                     data.getStringExtra("mainText"),
                     data.getStringExtra("dateTime"));
             notesAdapter.setItems(note);
