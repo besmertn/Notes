@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
             Note selectedNote = notesAdapter.getNote(selectedNotePosition);
             selectedNote.setMainText(data.getStringExtra("mainText"));
             selectedNote.setDateTime(data.getStringExtra("dateTime"));
+            notesAdapter.notifyDataSetChanged();
         }
     }
 
