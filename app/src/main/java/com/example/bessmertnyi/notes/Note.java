@@ -1,15 +1,16 @@
 package com.example.bessmertnyi.notes;
 
-import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 
-public class Note {
-    private Drawable image;
+public class Note implements Parcelable{
+    private byte[] image;
     private CharSequence mainText;
     private CharSequence shortText;
     private CharSequence dateTime;
 
-    public Note(Drawable image, CharSequence mainText, CharSequence dateTime) {
+    public Note(byte[] image, CharSequence mainText, CharSequence dateTime) {
         this.image = image;
         this.dateTime = dateTime;
         this.mainText = mainText;
@@ -27,6 +28,8 @@ public class Note {
         }
 
     }
+
+
 
     public CharSequence getMainText() {
         return mainText;
@@ -49,11 +52,11 @@ public class Note {
 
     }
 
-    public Drawable getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(Drawable image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
 
@@ -68,4 +71,38 @@ public class Note {
     public void setDateTime(CharSequence dateTime) {
         this.dateTime = dateTime;
     }
+
+    public Note(Parcel in){
+        String[] data = new String[4];
+
+        in.readStringArray(data);
+        // the order needs to be the same as in writeToParcel() method
+        this.image = data[0].getBytes();
+        this.dateTime = data[1];
+        this.mainText = data[2];
+    }
+
+    @Override
+    public int describeContents(){
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(new String[] {this.image.toString(),
+                this.dateTime.toString(),
+                this.mainText.toString()});
+    }
+
+    public static final Creator<Note> CREATOR = new Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
 }

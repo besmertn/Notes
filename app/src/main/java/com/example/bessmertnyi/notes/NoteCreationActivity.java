@@ -26,8 +26,8 @@ public class NoteCreationActivity extends AppCompatActivity {
         dateTime = this.getIntent().getStringExtra("dateTime");
         mainText = this.getIntent().getStringExtra("mainText");
 
-        final ImageButton button = findViewById(R.id.backImageButton);
-        button.setOnClickListener(new View.OnClickListener() {
+        final ImageButton backButton = findViewById(R.id.backImageButton);
+        backButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 EditText mainEditText = findViewById(R.id.mainTextEditText);
@@ -37,8 +37,20 @@ public class NoteCreationActivity extends AppCompatActivity {
                 } else {
                     intent.putExtra("dateTime", dateTime);
                 }
+                if(mainEditText.getText().toString().equals("")) {
+                    setResult(RESULT_CANCELED, intent);
+                } else {
+                    setResult(RESULT_OK, intent);
+                }
+                finish();
+            }
+        });
 
-                setResult(RESULT_OK, intent);
+        final ImageButton deleteButton = findViewById(R.id.deleteImageButton);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                setResult(RESULT_CANCELED, intent);
                 finish();
             }
         });

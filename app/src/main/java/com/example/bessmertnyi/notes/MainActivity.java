@@ -2,6 +2,8 @@ package com.example.bessmertnyi.notes;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
@@ -57,6 +60,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+       // onSaveInstanceState();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+       // outState.putString("notes", new Gson().toJson(notesAdapter.getNotes()).toString());
+        outState.putParcelableArrayList("notes", new ArrayList<Note>(notesAdapter.getNotes()));
+    }
+
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+      /*  String jsonMyObject = savedInstanceState.getString("notes");
+        Collection<Note> notes = new Gson().fromJson(jsonMyObject, List.class);*/
+        Collection<Note> notes = savedInstanceState.getParcelableArrayList("notes");
+        notesAdapter.setItems(notes);
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.action_bar_menu, menu);
@@ -84,7 +111,11 @@ public class MainActivity extends AppCompatActivity {
         //super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == CREATE_NEW_NOTE) {
             if(data == null) {return;}
-            Note note = new Note(this.getDrawable(android.R.drawable.ic_secure),
+            Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_light);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            Note note = new Note(byteArray,
                     data.getStringExtra("mainText"),
                     data.getStringExtra("dateTime"));
             notesAdapter.setItems(note);
@@ -96,27 +127,13 @@ public class MainActivity extends AppCompatActivity {
             selectedNote.setDateTime(data.getStringExtra("dateTime"));
             notesAdapter.notifyDataSetChanged();
         }
-    }
+        if (resultCode == Activity.RESULT_CANCELED && requestCode == EDIT_NOTE) {
+            if(data == null) {return;}
+            Note selectedNote = notesAdapter.getNote(selectedNotePosition);
+            notesAdapter.deleteItem(selectedNote);
+        }
 
-    private void loadNotes() {
-        Collection<Note> notes = getNotes();
-        notesAdapter.setItems(notes);
     }
-
-    private Collection<Note> getNotes(){
-        return Arrays.asList(
-                new Note(this.getDrawable(android.R.drawable.ic_secure),
-                        "Note number1",
-                        "da"),
-                new Note(this.getDrawable(android.R.drawable.ic_secure),
-                        "Note number2",
-                        "da"),
-                new Note(this.getDrawable(android.R.drawable.ic_secure),
-                        "Note number3",
-                        "da")
-        );
-    }
-
 }
 
 

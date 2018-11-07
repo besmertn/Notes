@@ -1,5 +1,7 @@
 package com.example.bessmertnyi.notes;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +44,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         public void bind(Note note) {
             mainTextView.setText(note.getShortText());
             dateTimeTextView.setText(note.getDateTime());
-            mainImageView.setImageDrawable(note.getImage());
+            byte[] imageBytes = note.getImage();
+            Bitmap bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            mainImageView.setImageBitmap(bmp);
         }
 
         @Override
@@ -72,6 +76,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         return values.get(position);
     }
 
+    public List<Note> getNotes() {
+        return values;
+    }
+
     public void setItems(Collection<Note> notes) {
         values.addAll(notes);
         notifyDataSetChanged();
@@ -81,9 +89,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         values.add(note);
         notifyDataSetChanged();
     }
-
+    public void deleteItem(Note note) {
+        values.remove(note);
+        notifyDataSetChanged();
+    }
     public void clearItems() {
         values.clear();
         notifyDataSetChanged();
     }
+
 }
