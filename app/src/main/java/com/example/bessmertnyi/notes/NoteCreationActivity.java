@@ -35,7 +35,6 @@ public class NoteCreationActivity extends AppCompatActivity {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
         image = stream.toByteArray();
-        //System.out.println(iimage);
 
         dateTime = this.getIntent().getStringExtra("dateTime");
         mainText = this.getIntent().getStringExtra("mainText");
@@ -48,7 +47,9 @@ public class NoteCreationActivity extends AppCompatActivity {
                 intent.putExtra("mainText", mainEditText.getText().toString());
                 intent.putExtra("image", image);
                 if((dateTime != null && !mainText.equals(mainTextEditText.getText().toString())) || dateTime == null) {
-                    intent.putExtra("dateTime", currentDateTimeTextView.getText().toString());
+                    String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                    intent.putExtra("dateTime", currentDateTimeString);
+                    System.out.println("+++++++++");
                 } else {
                     intent.putExtra("dateTime", dateTime);
                 }
@@ -107,6 +108,9 @@ public class NoteCreationActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE) {
+            if (data == null) {
+                return;
+            }
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
