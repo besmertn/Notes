@@ -22,9 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int CREATE_NEW_NOTE = 1;
     private static final int EDIT_NOTE = 2;
     private int selectedNotePosition;
-    private RecyclerView notesRecyclerView;
     private NoteAdapter notesAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +32,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-        notesRecyclerView = findViewById(R.id.my_recycler_view);
+        RecyclerView notesRecyclerView = findViewById(R.id.my_recycler_view);
 
 
         // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         notesRecyclerView.setLayoutManager(mLayoutManager);
 
         OnNoteClickListener listener = new OnNoteClickListener() {
@@ -53,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        notesAdapter = new NoteAdapter(listener);
+        notesAdapter = new NoteAdapter(listener, this);
         notesRecyclerView.setAdapter(notesAdapter);
 
         //loadNotes();
@@ -68,16 +66,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-       // outState.putString("notes", new Gson().toJson(notesAdapter.getNotes()).toString());
-        outState.putParcelableArrayList("notes", new ArrayList<Note>(notesAdapter.getNotes()));
+        outState.putParcelableArrayList("notes", new ArrayList<>(notesAdapter.getNotes()));
     }
 
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-      /*  String jsonMyObject = savedInstanceState.getString("notes");
-        Collection<Note> notes = new Gson().fromJson(jsonMyObject, List.class);*/
         Collection<Note> notes = savedInstanceState.getParcelableArrayList("notes");
         notesAdapter.setItems(notes);
 
@@ -111,12 +106,16 @@ public class MainActivity extends AppCompatActivity {
         //super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == CREATE_NEW_NOTE) {
             if(data == null) {return;}
-            Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_light);
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            System.out.println(byteArray);
-            Note note = new Note(data.getByteArrayExtra("image"),
+            String imagePath = data.getStringExtra("image");
+            byte[] imageAsBytes = new byte[1];
+            if (imagePath != null) {
+                Bitmap bmp = BitmapFactory.decodeFile(imagePath);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                imageAsBytes = stream.toByteArray();
+            }
+
+            Note note = new Note(imageAsBytes,
                     data.getStringExtra("mainText"),
                     data.getStringExtra("dateTime"));
             notesAdapter.setItems(note);
@@ -126,6 +125,16 @@ public class MainActivity extends AppCompatActivity {
             Note selectedNote = notesAdapter.getNote(selectedNotePosition);
             selectedNote.setMainText(data.getStringExtra("mainText"));
             selectedNote.setDateTime(data.getStringExtra("dateTime"));
+            String imagePath = data.getStringExtra("image");
+            if (imagePath != null) {
+                Bitmap bmp = BitmapFactory.decodeFile(imagePath);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                byte[] imageAsBytes = stream.toByteArray();
+                selectedNote.setImage(imageAsBytes);
+            }
+
+
             notesAdapter.notifyDataSetChanged();
         }
         if (resultCode == Activity.RESULT_CANCELED && requestCode == EDIT_NOTE) {

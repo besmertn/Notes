@@ -1,20 +1,23 @@
 package com.example.bessmertnyi.notes;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -25,19 +28,20 @@ public class NoteCreationActivity extends AppCompatActivity {
     EditText mainTextEditText;
     private  String dateTime;
     private  String mainText;
-    private byte[] image;
+    private Boolean imageSelectFlag = false;
+    private Uri imgUri;
+
+    private Bitmap image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_creation);
-        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_light);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        image = stream.toByteArray();
+        imageSelectFlag = false;
 
         dateTime = this.getIntent().getStringExtra("dateTime");
         mainText = this.getIntent().getStringExtra("mainText");
+
 
         final ImageButton backButton = findViewById(R.id.backImageButton);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -45,13 +49,17 @@ public class NoteCreationActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 EditText mainEditText = findViewById(R.id.mainTextEditText);
                 intent.putExtra("mainText", mainEditText.getText().toString());
-                intent.putExtra("image", image);
                 if((dateTime != null && !mainText.equals(mainTextEditText.getText().toString())) || dateTime == null) {
                     String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                     intent.putExtra("dateTime", currentDateTimeString);
-                    System.out.println("+++++++++");
                 } else {
                     intent.putExtra("dateTime", dateTime);
+                }
+                if (imageSelectFlag) {
+                    image = Bitmap.createScaledBitmap(image, 120, 160, true);
+                    String filePath = tempFileImage(NoteCreationActivity.this, image, "name");
+                    intent.putExtra("image", filePath);
+                    intent.putExtra("imgUri", imgUri);
                 }
                 if(mainEditText.getText().toString().equals("")) {
                     setResult(RESULT_CANCELED, intent);
@@ -77,7 +85,7 @@ public class NoteCreationActivity extends AppCompatActivity {
                 Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 getIntent.setType("image/*");
 
-                Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 pickIntent.setType("image/*");
 
                 Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
@@ -114,12 +122,33 @@ public class NoteCreationActivity extends AppCompatActivity {
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                image = stream.toByteArray();
+                //ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                //bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                //image = stream.toByteArray();
+                imageSelectFlag = true;
+                image = bitmap;
+                imgUri = imageUri;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String tempFileImage(Context context, Bitmap bitmap, String name) {
+
+        File outputDir = context.getCacheDir();
+        File imageFile = new File(outputDir, name + ".png");
+
+        OutputStream os;
+        try {
+            os = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            Log.e(context.getClass().getSimpleName(), "Error writing file", e);
+        }
+
+        return imageFile.getAbsolutePath();
     }
 }

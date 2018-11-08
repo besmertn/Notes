@@ -1,5 +1,6 @@
 package com.example.bessmertnyi.notes;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
@@ -16,11 +17,13 @@ import java.util.List;
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     private List<Note> values = new ArrayList<>();
 
-    public NoteAdapter(OnNoteClickListener listener) {
+    public NoteAdapter(OnNoteClickListener listener, Context context) {
         this.listener = listener;
+        this.context = context;
     }
 
     private OnNoteClickListener listener;
+    private Context context;
 
 
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -44,9 +47,17 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         public void bind(Note note) {
             mainTextView.setText(note.getShortText());
             dateTimeTextView.setText(note.getDateTime());
+            //byte[] imageAsBytes = Base64.decode(note.getImage().getBytes(), Base64.DEFAULT);
             byte[] imageBytes = note.getImage();
-            System.out.println(imageBytes);
+
             Bitmap bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            //Bitmap bmp = BitmapFactory.decodeFile(note.getImage());
+            /*Bitmap bmp = null;
+            try {
+                bmp = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse(note.getImage()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
             mainImageView.setImageBitmap(bmp);
         }
 
