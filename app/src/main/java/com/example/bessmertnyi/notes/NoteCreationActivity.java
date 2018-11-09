@@ -122,9 +122,6 @@ public class NoteCreationActivity extends AppCompatActivity {
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                //bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
-                //image = stream.toByteArray();
                 imageSelectFlag = true;
                 image = bitmap;
                 imgUri = imageUri;

@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        notesAdapter = new NoteAdapter(listener, this);
+        notesAdapter = new NoteAdapter(listener);
         notesRecyclerView.setAdapter(notesAdapter);
 
         //loadNotes();

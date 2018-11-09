@@ -1,8 +1,8 @@
 package com.example.bessmertnyi.notes;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +17,11 @@ import java.util.List;
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     private List<Note> values = new ArrayList<>();
 
-    public NoteAdapter(OnNoteClickListener listener, Context context) {
+    NoteAdapter(OnNoteClickListener listener) {
         this.listener = listener;
-        this.context = context;
     }
 
     private OnNoteClickListener listener;
-    private Context context;
 
 
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -35,7 +33,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
         private OnNoteClickListener listener;
 
-        public NoteViewHolder(View itemView, OnNoteClickListener listener) {
+        NoteViewHolder(View itemView, OnNoteClickListener listener) {
             super(itemView);
             this.listener = listener;
             itemView.setOnClickListener(this);
@@ -44,20 +42,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             mainImageView = itemView.findViewById(R.id.mainImageView);
         }
 
-        public void bind(Note note) {
+        void bind(Note note) {
             mainTextView.setText(note.getShortText());
             dateTimeTextView.setText(note.getDateTime());
-            //byte[] imageAsBytes = Base64.decode(note.getImage().getBytes(), Base64.DEFAULT);
             byte[] imageBytes = note.getImage();
-
             Bitmap bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-            //Bitmap bmp = BitmapFactory.decodeFile(note.getImage());
-            /*Bitmap bmp = null;
-            try {
-                bmp = MediaStore.Images.Media.getBitmap(context.getContentResolver(), Uri.parse(note.getImage()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
             mainImageView.setImageBitmap(bmp);
         }
 
@@ -67,15 +56,16 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         }
     }
 
+    @NonNull
     @Override
-    public NoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.note_view, parent, false);
         return new NoteViewHolder(v, listener);
     }
 
     @Override
-    public void onBindViewHolder(NoteViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
         holder.bind(values.get(position));
     }
 
