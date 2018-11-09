@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Notes</string>
-    <string name="note_date_time">dateTime</string>
-    <string name="note_main_text">mainText</string>
-    <string name="note_short_text">mainText</string>
+    <string name="new_note">New Note</string>
+
 </resources>
+
+
