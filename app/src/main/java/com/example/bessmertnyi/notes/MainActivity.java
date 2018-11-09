@@ -1,5 +1,6 @@
 package com.example.bessmertnyi.notes;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,15 +18,36 @@ import android.view.View;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
     private static final int CREATE_NEW_NOTE = 1;
     private static final int EDIT_NOTE = 2;
     private int selectedNotePosition;
     private NoteAdapter notesAdapter;
+    private AppDatabase db;
+    private NoteDao noteDao;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        App.destroyInstance();
+        super.onDestroy();
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        db = App.getInstance().getDatabase();
+        noteDao = db.noteDao();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -35,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView notesRecyclerView = findViewById(R.id.my_recycler_view);
 
 
-        // use a linear layout manager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         notesRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -44,17 +65,24 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
                 selectedNotePosition = position;
                 Intent intent = new Intent(MainActivity.this,
-                                                         NoteCreationActivity.class);
+                        NoteCreationActivity.class);
                 intent.putExtra("mainText", notesAdapter.getNote(position).getMainText());
                 intent.putExtra("dateTime", notesAdapter.getNote(position).getDateTime());
                 startActivityForResult(intent, EDIT_NOTE);
             }
         };
 
-        notesAdapter = new NoteAdapter(listener);
+        notesAdapter = new NoteAdapter(listener, noteDao);
         notesRecyclerView.setAdapter(notesAdapter);
 
-        //loadNotes();
+        noteDao.getAll()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Note>>() {
+                    @Override
+                    public void accept(List<Note> notes) {
+                        notesAdapter.setItems(notes);
+                    }
+                });
     }
 
     @Override
@@ -133,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 byte[] imageAsBytes = stream.toByteArray();
                 selectedNote.setImage(imageAsBytes);
             }
-
+            noteDao.update(selectedNote);
 
             notesAdapter.notifyDataSetChanged();
         }

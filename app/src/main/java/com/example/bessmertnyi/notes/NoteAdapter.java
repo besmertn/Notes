@@ -14,14 +14,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     private List<Note> values = new ArrayList<>();
 
-    NoteAdapter(OnNoteClickListener listener) {
+    NoteAdapter(OnNoteClickListener listener, NoteDao noteDao) {
+
+        this.noteDao = noteDao;
         this.listener = listener;
     }
 
     private OnNoteClickListener listener;
+    private NoteDao noteDao;
 
 
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -89,10 +96,25 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     public void setItems(Note note) {
         values.add(note);
+        noteDao.insert(note)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSingleObserver<Note>() {
+                    @Override
+                    public void onSuccess(Employee employee) {
+                        // ...
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        // ...
+                    }
+                });
         notifyDataSetChanged();
     }
     public void deleteItem(Note note) {
         values.remove(note);
+        noteDao.delete(note);
         notifyDataSetChanged();
     }
     public void clearItems() {
