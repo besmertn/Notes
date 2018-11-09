@@ -20,11 +20,11 @@ public interface NoteDao {
     Single<Note> getById(long id);
 
     @Insert
-    Single<Integer> insert(Note note);
+    void insert(Note note);
 
     @Update
-    Single<Integer> update(Note note);
+    void update(Note note);
 
     @Delete
-    Single<Integer> delete(Note note);
+    void delete(Note note);
 }

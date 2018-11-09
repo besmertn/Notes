@@ -13,9 +13,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
@@ -94,22 +95,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         notifyDataSetChanged();
     }
 
-    public void setItems(Note note) {
+    public void setItems(final Note note) {
         values.add(note);
-        noteDao.insert(note)
+        Callable<Void> clb = new Callable<Void>() {
+            @Override
+            public Void call() {
+                noteDao.insert(note);
+                return null;
+            }
+        };
+        //Completable.fromCallable(clb).subscribe();
+        Completable.fromCallable(clb)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<Note>() {
-                    @Override
-                    public void onSuccess(Employee employee) {
-                        // ...
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // ...
-                    }
-                });
+                .subscribe();
         notifyDataSetChanged();
     }
     public void deleteItem(Note note) {
