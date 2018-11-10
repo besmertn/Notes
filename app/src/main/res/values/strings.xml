@@ -2,6 +2,19 @@
     <string name="app_name">Notes</string>
     <string name="new_note">New Note</string>
 
+    <string-array name="status_array">
+        <item>Planned</item>
+        <item>Active</item>
+        <item>Completed</item>
+    </string-array>
+
+    <string-array name="status_filter_array">
+        <item>All</item>
+        <item>Planned</item>
+        <item>Active</item>
+        <item>Completed</item>
+    </string-array>
+
 </resources>
 
 

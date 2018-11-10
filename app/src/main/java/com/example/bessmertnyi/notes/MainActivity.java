@@ -13,16 +13,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private static final int CREATE_NEW_NOTE = 1;
     private static final int EDIT_NOTE = 2;
     private int selectedNotePosition;
     private NoteAdapter notesAdapter;
+    private Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +51,25 @@ public class MainActivity extends AppCompatActivity {
                                                          NoteCreationActivity.class);
                 intent.putExtra("mainText", notesAdapter.getNote(position).getMainText());
                 intent.putExtra("dateTime", notesAdapter.getNote(position).getDateTime());
+                intent.putExtra("status", notesAdapter.getNote(position).getCategory());
                 startActivityForResult(intent, EDIT_NOTE);
             }
         };
 
         notesAdapter = new NoteAdapter(listener);
         notesRecyclerView.setAdapter(notesAdapter);
+
+        spinner = findViewById(R.id.statusFilterSpiner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.status_filter_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
+
 
         //loadNotes();
     }
@@ -117,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
 
             Note note = new Note(imageAsBytes,
                     data.getStringExtra("mainText"),
-                    data.getStringExtra("dateTime"));
+                    data.getStringExtra("dateTime"),
+                    data.getStringExtra("status"));
             notesAdapter.setItems(note);
         }
         if (resultCode == Activity.RESULT_OK && requestCode == EDIT_NOTE) {
@@ -125,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             Note selectedNote = notesAdapter.getNote(selectedNotePosition);
             selectedNote.setMainText(data.getStringExtra("mainText"));
             selectedNote.setDateTime(data.getStringExtra("dateTime"));
+            selectedNote.setCategory(data.getStringExtra("status"));
             String imagePath = data.getStringExtra("image");
             if (imagePath != null) {
                 Bitmap bmp = BitmapFactory.decodeFile(imagePath);
@@ -142,6 +161,16 @@ public class MainActivity extends AppCompatActivity {
             Note selectedNote = notesAdapter.getNote(selectedNotePosition);
             notesAdapter.deleteItem(selectedNote);
         }
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        notesAdapter.filterNotes(parent.getItemAtPosition(position).toString());
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 }

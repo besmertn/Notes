@@ -16,9 +16,11 @@ import java.util.List;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     private List<Note> values = new ArrayList<>();
+    private List<Note> valuesCopy = new ArrayList<>();
 
     NoteAdapter(OnNoteClickListener listener) {
         this.listener = listener;
+        valuesCopy.addAll(values);
     }
 
     private OnNoteClickListener listener;
@@ -27,6 +29,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mainTextView;
+        private TextView statusTextVIew;
         private TextView dateTimeTextView;
         private ImageView mainImageView;
 
@@ -40,11 +43,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             mainTextView = itemView.findViewById(R.id.mainTextView);
             dateTimeTextView = itemView.findViewById(R.id.dateTimeTextView);
             mainImageView = itemView.findViewById(R.id.mainImageView);
+            statusTextVIew = itemView.findViewById(R.id.statusTextView);
         }
 
         void bind(Note note) {
             mainTextView.setText(note.getShortText());
             dateTimeTextView.setText(note.getDateTime());
+            statusTextVIew.setText(note.getCategory());
             byte[] imageBytes = note.getImage();
             Bitmap bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             mainImageView.setImageBitmap(bmp);
@@ -97,6 +102,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     }
     public void clearItems() {
         values.clear();
+        notifyDataSetChanged();
+    }
+
+    public void filterNotes(final String status) {
+        values.clear();
+        if(status.equals("All")){
+            values.addAll(valuesCopy);
+        } else{
+            for(Note note: valuesCopy){
+                if(note.getCategory().equals(status)){
+                    values.add(note);
+                }
+            }
+        }
         notifyDataSetChanged();
     }
 

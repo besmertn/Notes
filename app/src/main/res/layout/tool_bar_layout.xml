@@ -18,7 +18,14 @@
             android:background="?attr/colorPrimary"
             android:elevation="4dp"
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/statusFilterSpiner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"/>
+        </android.support.v7.widget.Toolbar>>
 
 
     </android.support.design.widget.AppBarLayout>

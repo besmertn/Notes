@@ -9,15 +9,17 @@ public class Note implements Parcelable{
     private CharSequence mainText;
     private CharSequence shortText;
     private CharSequence dateTime;
+    private CharSequence category;
 
-    public Note(byte[] image, CharSequence mainText, CharSequence dateTime) {
+    public Note(byte[] image, CharSequence mainText, CharSequence dateTime, CharSequence category) {
         this.image = image;
+        this.category = category;
         System.out.println(image);
         this.dateTime = dateTime;
         this.mainText = mainText;
         String[] lines = mainText.toString().split("\r\n|\r|\n");
-        if(mainText.length() > 40 || lines.length > 2) {
-            if(lines.length > 2) {
+        if(mainText.length() > 40 || lines.length > 1) {
+            if(lines.length > 1) {
                 String shortStr = lines[0] + "\r\n" + lines[1] + "...";
                 this.shortText = shortStr;
             } else {
@@ -106,4 +108,12 @@ public class Note implements Parcelable{
             return new Note[size];
         }
     };
+
+    public CharSequence getCategory() {
+        return category;
+    }
+
+    public void setCategory(CharSequence category) {
+        this.category = category;
+    }
 }

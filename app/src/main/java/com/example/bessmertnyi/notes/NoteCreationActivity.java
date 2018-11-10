@@ -10,8 +10,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.File;
@@ -21,7 +24,7 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class NoteCreationActivity extends AppCompatActivity {
+public class NoteCreationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private static final int PICK_IMAGE = 1;
     TextView currentDateTimeTextView;
@@ -30,6 +33,7 @@ public class NoteCreationActivity extends AppCompatActivity {
     private  String mainText;
     private Boolean imageSelectFlag = false;
     private Uri imgUri;
+    private String status;
 
     private Bitmap image;
 
@@ -41,6 +45,26 @@ public class NoteCreationActivity extends AppCompatActivity {
 
         dateTime = this.getIntent().getStringExtra("dateTime");
         mainText = this.getIntent().getStringExtra("mainText");
+        status = this.getIntent().getStringExtra("status");
+        if(status == null) {
+            status = "Planned";
+        }
+
+
+
+
+        Spinner spinner = findViewById(R.id.statusSpiner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                        R.array.status_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+                spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
+
+
 
 
         final ImageButton backButton = findViewById(R.id.backImageButton);
@@ -49,6 +73,7 @@ public class NoteCreationActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 EditText mainEditText = findViewById(R.id.mainTextEditText);
                 intent.putExtra("mainText", mainEditText.getText().toString());
+                intent.putExtra("status", status);
                 if((dateTime != null && !mainText.equals(mainTextEditText.getText().toString())) || dateTime == null) {
                     String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                     intent.putExtra("dateTime", currentDateTimeString);
@@ -147,5 +172,15 @@ public class NoteCreationActivity extends AppCompatActivity {
         }
 
         return imageFile.getAbsolutePath();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        status = parent.getItemAtPosition(position).toString();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
