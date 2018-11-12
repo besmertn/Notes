@@ -21,7 +21,7 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
             <android.support.v7.widget.AppCompatSpinner
-                android:id="@+id/statusFilterSpiner"
+                android:id="@+id/statusFilterSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"/>

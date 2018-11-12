@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                          NoteCreationActivity.class);
                 intent.putExtra("mainText", notesAdapter.getNote(position).getMainText());
                 intent.putExtra("dateTime", notesAdapter.getNote(position).getDateTime());
-                intent.putExtra("status", notesAdapter.getNote(position).getCategory());
+                intent.putExtra("status", notesAdapter.getNote(position).getStatus());
                 startActivityForResult(intent, EDIT_NOTE);
             }
         };
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         notesAdapter = new NoteAdapter(listener);
         notesRecyclerView.setAdapter(notesAdapter);
 
-        spinner = findViewById(R.id.statusFilterSpiner);
+        spinner = findViewById(R.id.statusFilterSpinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.status_filter_array, android.R.layout.simple_spinner_item);
@@ -74,11 +74,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //loadNotes();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-       // onSaveInstanceState();
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -137,13 +132,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     data.getStringExtra("dateTime"),
                     data.getStringExtra("status"));
             notesAdapter.setItems(note);
+            notesAdapter.filterNotes(spinner.getSelectedItem().toString());
         }
         if (resultCode == Activity.RESULT_OK && requestCode == EDIT_NOTE) {
             if(data == null) {return;}
             Note selectedNote = notesAdapter.getNote(selectedNotePosition);
             selectedNote.setMainText(data.getStringExtra("mainText"));
             selectedNote.setDateTime(data.getStringExtra("dateTime"));
-            selectedNote.setCategory(data.getStringExtra("status"));
+            selectedNote.setStatus(data.getStringExtra("status"));
             String imagePath = data.getStringExtra("image");
             if (imagePath != null) {
                 Bitmap bmp = BitmapFactory.decodeFile(imagePath);
@@ -152,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 byte[] imageAsBytes = stream.toByteArray();
                 selectedNote.setImage(imageAsBytes);
             }
-
 
             notesAdapter.notifyDataSetChanged();
         }

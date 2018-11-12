@@ -9,11 +9,11 @@ public class Note implements Parcelable{
     private CharSequence mainText;
     private CharSequence shortText;
     private CharSequence dateTime;
-    private CharSequence category;
+    private CharSequence status;
 
-    public Note(byte[] image, CharSequence mainText, CharSequence dateTime, CharSequence category) {
+    public Note(byte[] image, CharSequence mainText, CharSequence dateTime, CharSequence status) {
         this.image = image;
-        this.category = category;
+        this.status = status;
         System.out.println(image);
         this.dateTime = dateTime;
         this.mainText = mainText;
@@ -109,11 +109,11 @@ public class Note implements Parcelable{
         }
     };
 
-    public CharSequence getCategory() {
-        return category;
+    public CharSequence getStatus() {
+        return status;
     }
 
-    public void setCategory(CharSequence category) {
-        this.category = category;
+    public void setStatus(CharSequence status) {
+        this.status = status;
     }
 }

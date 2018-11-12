@@ -49,7 +49,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         void bind(Note note) {
             mainTextView.setText(note.getShortText());
             dateTimeTextView.setText(note.getDateTime());
-            statusTextVIew.setText(note.getCategory());
+            statusTextVIew.setText(note.getStatus());
             byte[] imageBytes = note.getImage();
             Bitmap bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             mainImageView.setImageBitmap(bmp);
@@ -84,20 +84,23 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     }
 
     public List<Note> getNotes() {
-        return values;
+        return valuesCopy;
     }
 
     public void setItems(Collection<Note> notes) {
+        valuesCopy.addAll(notes);
         values.addAll(notes);
         notifyDataSetChanged();
     }
 
     public void setItems(Note note) {
         values.add(note);
+        valuesCopy.add(note);
         notifyDataSetChanged();
     }
     public void deleteItem(Note note) {
         values.remove(note);
+        valuesCopy.remove(note);
         notifyDataSetChanged();
     }
     public void clearItems() {
@@ -111,7 +114,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             values.addAll(valuesCopy);
         } else{
             for(Note note: valuesCopy){
-                if(note.getCategory().equals(status)){
+                if (note.getStatus().equals(status)) {
                     values.add(note);
                 }
             }
