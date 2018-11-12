@@ -1,24 +1,32 @@
 package com.example.bessmertnyi.notes;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.Arrays;
 
 
+@Entity
 public class Note implements Parcelable{
+
+    @PrimaryKey(autoGenerate = true)
+    private long id;
     private byte[] image;
-    private CharSequence mainText;
-    private CharSequence shortText;
-    private CharSequence dateTime;
+    private String mainText;
+    @Ignore
+    private String shortText;
+    private String dateTime;
     private int status;
 
-    Note(byte[] image, CharSequence mainText, CharSequence dateTime, int status) {
+    Note(byte[] image, String mainText, String dateTime, int status) {
         this.image = image;
         this.status = status;
         this.dateTime = dateTime;
         this.mainText = mainText;
-        String[] lines = mainText.toString().split("\r\n|\r|\n");
+        String[] lines = mainText.split("\r\n|\r|\n");
         if(mainText.length() > 40 || lines.length > 1) {
             if(lines.length > 1) {
                 this.shortText = lines[0] + "\r\n" + lines[1] + "...";
@@ -31,13 +39,13 @@ public class Note implements Parcelable{
         }
     }
 
-    CharSequence getMainText() {
+    String getMainText() {
         return mainText;
     }
 
-    void setMainText(CharSequence mainText) {
+    void setMainText(String mainText) {
         this.mainText = mainText;
-        String[] lines = mainText.toString().split("\r\n|\r|\n");
+        String[] lines = mainText.split("\r\n|\r|\n");
         if(mainText.length() > 40 || lines.length > 2) {
             if(lines.length > 2) {
                 this.shortText = lines[0] + "\r\n" + lines[1] + "...";
@@ -59,15 +67,15 @@ public class Note implements Parcelable{
         this.image = image;
     }
 
-    CharSequence getShortText() {
+    String getShortText() {
         return shortText;
     }
 
-    CharSequence getDateTime() {
+    String getDateTime() {
         return dateTime;
     }
 
-    void setDateTime(CharSequence dateTime) {
+    void setDateTime(String dateTime) {
         this.dateTime = dateTime;
     }
 
@@ -90,8 +98,8 @@ public class Note implements Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[]{Arrays.toString(this.image),
-                this.dateTime.toString(),
-                this.mainText.toString(),
+                this.dateTime,
+                this.mainText,
                 Integer.toString(this.status)});
     }
 
@@ -113,5 +121,13 @@ public class Note implements Parcelable{
 
     void setStatus(int status) {
         this.status = status;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

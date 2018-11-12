@@ -1,5 +1,6 @@
 package com.example.bessmertnyi.notes;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,6 +21,10 @@ import android.widget.Spinner;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private static final int CREATE_NEW_NOTE = 1;
@@ -27,9 +32,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private int selectedNotePosition;
     private NoteAdapter notesAdapter;
     private Spinner spinner;
+    private AppDatabase db;
+    private NoteDao noteDao;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        App.destroyInstance();
+        super.onDestroy();
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
+        db = App.getInstance().getDatabase();
+        noteDao = db.noteDao();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -48,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(View view, int position) {
                 selectedNotePosition = position;
                 Intent intent = new Intent(MainActivity.this,
-                                                         NoteCreationActivity.class);
+                        NoteCreationActivity.class);
                 intent.putExtra("mainText", notesAdapter.getNote(position).getMainText());
                 intent.putExtra("dateTime", notesAdapter.getNote(position).getDateTime());
                 intent.putExtra("status", notesAdapter.getNote(position).getStatus());
@@ -56,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         };
 
-        notesAdapter = new NoteAdapter(listener, this);
+        notesAdapter = new NoteAdapter(listener, this, noteDao);
         notesRecyclerView.setAdapter(notesAdapter);
 
         spinner = findViewById(R.id.statusFilterSpinner);
@@ -72,6 +94,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
         //loadNotes();
+        noteDao.getAll()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Note>>() {
+                    @Override
+                    public void accept(List<Note> notes) {
+                        notesAdapter.setItems(notes);
+                    }
+                });
     }
 
 
@@ -148,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 byte[] imageAsBytes = stream.toByteArray();
                 selectedNote.setImage(imageAsBytes);
             }
+
+            noteDao.update(selectedNote);
 
             notesAdapter.notifyDataSetChanged();
         }

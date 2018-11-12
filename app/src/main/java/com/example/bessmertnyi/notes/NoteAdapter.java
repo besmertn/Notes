@@ -14,12 +14,19 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+
+import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     private List<Note> values = new ArrayList<>();
     private List<Note> valuesCopy = new ArrayList<>();
 
-    NoteAdapter(OnNoteClickListener listener, Context context) {
+    NoteAdapter(OnNoteClickListener listener, Context context, NoteDao noteDao) {
+
+        this.noteDao = noteDao;
         this.listener = listener;
         valuesCopy.addAll(values);
         this.context = context;
@@ -27,6 +34,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     private OnNoteClickListener listener;
     private Context context;
+    private NoteDao noteDao;
 
 
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -95,8 +103,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         notifyDataSetChanged();
     }
 
-    void setItems(Note note) {
+    void setItems(final Note note) {
         values.add(note);
+        Callable<Void> clb = new Callable<Void>() {
+            @Override
+            public Void call() {
+                noteDao.insert(note);
+                return null;
+            }
+        };
+        //Completable.fromCallable(clb).subscribe();
+        Completable.fromCallable(clb)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
         valuesCopy.add(note);
         notifyDataSetChanged();
     }
@@ -104,6 +124,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     void deleteItem(Note note) {
         values.remove(note);
         valuesCopy.remove(note);
+        noteDao.delete(note);
         notifyDataSetChanged();
     }
 
