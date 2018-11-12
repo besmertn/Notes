@@ -2,6 +2,19 @@
     <string name="app_name">Нотатки</string>
     <string name="new_note">Новый Нотаток</string>
 
+    <string-array name="status_array">
+        <item>Заплановано</item>
+        <item>Активне</item>
+        <item>Закінчено</item>
+    </string-array>
+
+    <string-array name="status_filter_array">
+        <item>Усі</item>
+        <item>Заплановані</item>
+        <item>Активні</item>
+        <item>Закінчені</item>
+    </string-array>
+
 </resources>
 
 

@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         };
 
-        notesAdapter = new NoteAdapter(listener);
+        notesAdapter = new NoteAdapter(listener, this);
         notesRecyclerView.setAdapter(notesAdapter);
 
         spinner = findViewById(R.id.statusFilterSpinner);
@@ -130,16 +130,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Note note = new Note(imageAsBytes,
                     data.getStringExtra("mainText"),
                     data.getStringExtra("dateTime"),
-                    data.getStringExtra("status"));
+                    data.getIntExtra("status", 0));
             notesAdapter.setItems(note);
-            notesAdapter.filterNotes(spinner.getSelectedItem().toString());
+            notesAdapter.filterNotes(spinner.getSelectedItemPosition() - 1);
         }
         if (resultCode == Activity.RESULT_OK && requestCode == EDIT_NOTE) {
             if(data == null) {return;}
             Note selectedNote = notesAdapter.getNote(selectedNotePosition);
             selectedNote.setMainText(data.getStringExtra("mainText"));
             selectedNote.setDateTime(data.getStringExtra("dateTime"));
-            selectedNote.setStatus(data.getStringExtra("status"));
+            selectedNote.setStatus(data.getIntExtra("status", 0));
             String imagePath = data.getStringExtra("image");
             if (imagePath != null) {
                 Bitmap bmp = BitmapFactory.decodeFile(imagePath);
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        notesAdapter.filterNotes(parent.getItemAtPosition(position).toString());
+        notesAdapter.filterNotes(position - 1);
     }
 
     @Override

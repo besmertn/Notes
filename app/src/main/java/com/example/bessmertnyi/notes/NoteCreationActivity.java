@@ -33,7 +33,7 @@ public class NoteCreationActivity extends AppCompatActivity implements AdapterVi
     private  String mainText;
     private Boolean imageSelectFlag = false;
     private Uri imgUri;
-    private String status;
+    private int status;
 
     private Bitmap image;
 
@@ -45,10 +45,7 @@ public class NoteCreationActivity extends AppCompatActivity implements AdapterVi
 
         dateTime = this.getIntent().getStringExtra("dateTime");
         mainText = this.getIntent().getStringExtra("mainText");
-        status = this.getIntent().getStringExtra("status");
-        if(status == null) {
-            status = "Planned";
-        }
+        status = this.getIntent().getIntExtra("status", 0);
 
 
 
@@ -176,7 +173,7 @@ public class NoteCreationActivity extends AppCompatActivity implements AdapterVi
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        status = parent.getItemAtPosition(position).toString();
+        status = position;
     }
 
     @Override

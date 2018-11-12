@@ -1,5 +1,6 @@
 package com.example.bessmertnyi.notes;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -18,12 +19,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     private List<Note> values = new ArrayList<>();
     private List<Note> valuesCopy = new ArrayList<>();
 
-    NoteAdapter(OnNoteClickListener listener) {
+    NoteAdapter(OnNoteClickListener listener, Context context) {
         this.listener = listener;
         valuesCopy.addAll(values);
+        this.context = context;
     }
 
     private OnNoteClickListener listener;
+    private Context context;
 
 
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -32,7 +35,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         private TextView statusTextVIew;
         private TextView dateTimeTextView;
         private ImageView mainImageView;
-
 
         private OnNoteClickListener listener;
 
@@ -49,7 +51,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         void bind(Note note) {
             mainTextView.setText(note.getShortText());
             dateTimeTextView.setText(note.getDateTime());
-            statusTextVIew.setText(note.getStatus());
+            statusTextVIew.setText(context.getResources().getStringArray(R.array.status_array)[note.getStatus()]);
             byte[] imageBytes = note.getImage();
             Bitmap bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             mainImageView.setImageBitmap(bmp);
@@ -79,7 +81,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         return values.size();
     }
 
-    public Note getNote(int position) {
+    Note getNote(int position) {
         return values.get(position);
     }
 
@@ -87,34 +89,31 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         return valuesCopy;
     }
 
-    public void setItems(Collection<Note> notes) {
+    void setItems(Collection<Note> notes) {
         valuesCopy.addAll(notes);
         values.addAll(notes);
         notifyDataSetChanged();
     }
 
-    public void setItems(Note note) {
+    void setItems(Note note) {
         values.add(note);
         valuesCopy.add(note);
         notifyDataSetChanged();
     }
-    public void deleteItem(Note note) {
+
+    void deleteItem(Note note) {
         values.remove(note);
         valuesCopy.remove(note);
         notifyDataSetChanged();
     }
-    public void clearItems() {
-        values.clear();
-        notifyDataSetChanged();
-    }
 
-    public void filterNotes(final String status) {
+    void filterNotes(final int status) {
         values.clear();
-        if(status.equals("All")){
+        if (status == -1) {
             values.addAll(valuesCopy);
         } else{
             for(Note note: valuesCopy){
-                if (note.getStatus().equals(status)) {
+                if (note.getStatus() == status) {
                     values.add(note);
                 }
             }

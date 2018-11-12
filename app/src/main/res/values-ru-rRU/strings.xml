@@ -2,6 +2,19 @@
     <string name="app_name">Заметки</string>
     <string name="new_note">Новая Заметка</string>
 
+    <string-array name="status_array">
+        <item>Запланировано</item>
+        <item>Активно</item>
+        <item>Завершено</item>
+    </string-array>
+
+    <string-array name="status_filter_array">
+        <item>Все</item>
+        <item>Запланированные</item>
+        <item>Активные</item>
+        <item>Завершённые</item>
+    </string-array>
+
 </resources>
 
 

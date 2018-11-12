@@ -3,25 +3,25 @@ package com.example.bessmertnyi.notes;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Arrays;
+
 
 public class Note implements Parcelable{
     private byte[] image;
     private CharSequence mainText;
     private CharSequence shortText;
     private CharSequence dateTime;
-    private CharSequence status;
+    private int status;
 
-    public Note(byte[] image, CharSequence mainText, CharSequence dateTime, CharSequence status) {
+    Note(byte[] image, CharSequence mainText, CharSequence dateTime, int status) {
         this.image = image;
         this.status = status;
-        System.out.println(image);
         this.dateTime = dateTime;
         this.mainText = mainText;
         String[] lines = mainText.toString().split("\r\n|\r|\n");
         if(mainText.length() > 40 || lines.length > 1) {
             if(lines.length > 1) {
-                String shortStr = lines[0] + "\r\n" + lines[1] + "...";
-                this.shortText = shortStr;
+                this.shortText = lines[0] + "\r\n" + lines[1] + "...";
             } else {
                 this.shortText = mainText.subSequence(0, 40) + "...";
             }
@@ -29,22 +29,18 @@ public class Note implements Parcelable{
         } else {
             shortText = mainText;
         }
-
     }
 
-
-
-    public CharSequence getMainText() {
+    CharSequence getMainText() {
         return mainText;
     }
 
-    public void setMainText(CharSequence mainText) {
+    void setMainText(CharSequence mainText) {
         this.mainText = mainText;
         String[] lines = mainText.toString().split("\r\n|\r|\n");
         if(mainText.length() > 40 || lines.length > 2) {
             if(lines.length > 2) {
-                String shortStr = lines[0] + "\r\n" + lines[1] + "...";
-                this.shortText = shortStr;
+                this.shortText = lines[0] + "\r\n" + lines[1] + "...";
             } else {
                 this.shortText = mainText.subSequence(0, 40) + "...";
             }
@@ -63,19 +59,19 @@ public class Note implements Parcelable{
         this.image = image;
     }
 
-    public CharSequence getShortText() {
+    CharSequence getShortText() {
         return shortText;
     }
 
-    public CharSequence getDateTime() {
+    CharSequence getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(CharSequence dateTime) {
+    void setDateTime(CharSequence dateTime) {
         this.dateTime = dateTime;
     }
 
-    public Note(Parcel in){
+    private Note(Parcel in) {
         String[] data = new String[4];
 
         in.readStringArray(data);
@@ -83,6 +79,7 @@ public class Note implements Parcelable{
         this.image = data[0].getBytes();
         this.dateTime = data[1];
         this.mainText = data[2];
+        this.status = Integer.parseInt(data[3]);
     }
 
     @Override
@@ -92,9 +89,10 @@ public class Note implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[] {this.image.toString(),
+        dest.writeStringArray(new String[]{Arrays.toString(this.image),
                 this.dateTime.toString(),
-                this.mainText.toString()});
+                this.mainText.toString(),
+                Integer.toString(this.status)});
     }
 
     public static final Creator<Note> CREATOR = new Creator<Note>() {
@@ -109,11 +107,11 @@ public class Note implements Parcelable{
         }
     };
 
-    public CharSequence getStatus() {
+    int getStatus() {
         return status;
     }
 
-    public void setStatus(CharSequence status) {
+    void setStatus(int status) {
         this.status = status;
     }
 }
