@@ -22,9 +22,12 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private static final int CREATE_NEW_NOTE = 1;
@@ -32,12 +35,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private int selectedNotePosition;
     private NoteAdapter notesAdapter;
     private Spinner spinner;
-    private AppDatabase db;
-    private NoteDao noteDao;
+    /*private AppDatabase db;
+    private NoteDao noteDao;*/
 
     @Override
     protected void onStart() {
         super.onStart();
+
 
     }
 
@@ -50,9 +54,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        db = App.getInstance().getDatabase();
-        noteDao = db.noteDao();
+
         super.onCreate(savedInstanceState);
+        /*db = App.getInstance().getDatabase();
+        noteDao = db.noteDao();*/
         setContentView(R.layout.activity_main);
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
@@ -78,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         };
 
-        notesAdapter = new NoteAdapter(listener, this, noteDao);
+        notesAdapter = new NoteAdapter(listener, this, App.getInstance().getDatabase().noteDao());
         notesRecyclerView.setAdapter(notesAdapter);
 
         spinner = findViewById(R.id.statusFilterSpinner);
@@ -94,12 +99,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
         //loadNotes();
-        noteDao.getAll()
+        App.getInstance().getDatabase().noteDao().getAll()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<Note>>() {
                     @Override
                     public void accept(List<Note> notes) {
-                        notesAdapter.setItems(notes);
+                        notesAdapter.setNotesList(notes);
                     }
                 });
     }
@@ -116,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         Collection<Note> notes = savedInstanceState.getParcelableArrayList("notes");
-        notesAdapter.setItems(notes);
+        notesAdapter.setNotesList(notes);
 
     }
 
@@ -166,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         if (resultCode == Activity.RESULT_OK && requestCode == EDIT_NOTE) {
             if(data == null) {return;}
-            Note selectedNote = notesAdapter.getNote(selectedNotePosition);
+            final Note selectedNote = notesAdapter.getNote(selectedNotePosition);
             selectedNote.setMainText(data.getStringExtra("mainText"));
             selectedNote.setDateTime(data.getStringExtra("dateTime"));
             selectedNote.setStatus(data.getIntExtra("status", 0));
@@ -179,7 +184,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 selectedNote.setImage(imageAsBytes);
             }
 
-            noteDao.update(selectedNote);
+            Callable<Void> clb = new Callable<Void>() {
+                @Override
+                public Void call() {
+                    App.getInstance().getDatabase().noteDao().update(selectedNote);
+                    return null;
+                }
+            };
+            //Completable.fromCallable(clb).subscribe();
+            Completable.fromCallable(clb)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe();
 
             notesAdapter.notifyDataSetChanged();
         }

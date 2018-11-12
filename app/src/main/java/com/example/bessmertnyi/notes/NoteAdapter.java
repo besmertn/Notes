@@ -97,6 +97,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         return valuesCopy;
     }
 
+    void setNotesList(Collection<Note> notes) {
+        valuesCopy.clear();
+        values.clear();
+        valuesCopy.addAll(notes);
+        values.addAll(notes);
+        notifyDataSetChanged();
+    }
+
     void setItems(Collection<Note> notes) {
         valuesCopy.addAll(notes);
         values.addAll(notes);
@@ -104,7 +112,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     }
 
     void setItems(final Note note) {
-        values.add(note);
+        /*values.add(note);
+        valuesCopy.add(note);*/
         Callable<Void> clb = new Callable<Void>() {
             @Override
             public Void call() {
@@ -117,14 +126,25 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
-        valuesCopy.add(note);
+
         notifyDataSetChanged();
     }
 
-    void deleteItem(Note note) {
-        values.remove(note);
-        valuesCopy.remove(note);
-        noteDao.delete(note);
+    void deleteItem(final Note note) {
+        /*values.remove(note);
+        valuesCopy.remove(note);*/
+        Callable<Void> clb = new Callable<Void>() {
+            @Override
+            public Void call() {
+                noteDao.delete(note);
+                return null;
+            }
+        };
+        //Completable.fromCallable(clb).subscribe();
+        Completable.fromCallable(clb)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
         notifyDataSetChanged();
     }
 

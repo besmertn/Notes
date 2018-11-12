@@ -13,6 +13,7 @@ public class App extends Application {
         super.onCreate();
         instance = this;
         database = Room.databaseBuilder(this, AppDatabase.class, "database")
+                .fallbackToDestructiveMigration()
                 .build();
     }
 
