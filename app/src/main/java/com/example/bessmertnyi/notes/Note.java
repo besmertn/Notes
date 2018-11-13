@@ -1,22 +1,16 @@
 package com.example.bessmertnyi.notes;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.Arrays;
 
 
-@Entity
 public class Note implements Parcelable{
 
-    @PrimaryKey(autoGenerate = true)
     private long id;
     private byte[] image;
     private String mainText;
-    @Ignore
     private String shortText;
     private String dateTime;
     private int status;

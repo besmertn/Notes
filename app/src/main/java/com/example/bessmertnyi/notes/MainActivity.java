@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -28,23 +26,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
 
-import io.reactivex.Completable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private static final int CREATE_NEW_NOTE = 1;
     private static final int EDIT_NOTE = 2;
     private static final int RUNTIME_PERMISSION_CODE = 3;
     private int selectedNotePosition;
-    private NoteAdapter notesAdapter;
+    private AudioAdapter notesAdapter;
     private Spinner spinner;
 
 
@@ -74,14 +67,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 selectedNotePosition = position;
                 Intent intent = new Intent(MainActivity.this,
                         NoteCreationActivity.class);
-                intent.putExtra("mainText", notesAdapter.getNote(position).getMainText());
-                intent.putExtra("dateTime", notesAdapter.getNote(position).getDateTime());
-                intent.putExtra("status", notesAdapter.getNote(position).getStatus());
                 startActivityForResult(intent, EDIT_NOTE);
             }
         };
 
-        notesAdapter = new NoteAdapter(listener, this, App.getInstance().getDatabase().noteDao());
+        notesAdapter = new AudioAdapter(listener, this);
         notesRecyclerView.setAdapter(notesAdapter);
 
         spinner = findViewById(R.id.statusFilterSpinner);
@@ -93,19 +83,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setOnItemSelectedListener(this);
 
 
-        //loadNotes();
-        App.getInstance().getDatabase().noteDao().getAll()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<Note>>() {
-                    @Override
-                    public void accept(List<Note> notes) {
-                        notesAdapter.setNotesList(notes);
-                    }
-                });
-
         AndroidRuntimePermission();
 
         ArrayList<AudioModel> lst = new ArrayList<>(getAllAudioFromDevice());
+        notesAdapter.setAudioList(lst);
+        /*MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(lst.get(2).getaPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.start();*/
         System.out.println(lst.toString());
     }
 
@@ -113,15 +106,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("notes", new ArrayList<>(notesAdapter.getNotes()));
+        outState.putParcelableArrayList("items", new ArrayList<>(notesAdapter.getNotes()));
     }
 
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Collection<Note> notes = savedInstanceState.getParcelableArrayList("notes");
-        notesAdapter.setNotesList(notes);
+        Collection<AudioModel> items = savedInstanceState.getParcelableArrayList("items");
+        notesAdapter.setAudioList(items);
 
     }
 
@@ -153,112 +146,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == CREATE_NEW_NOTE) {
             if(data == null) {return;}
-            String imagePath = data.getStringExtra("image");
-            byte[] imageAsBytes = new byte[1];
-            if (imagePath != null) {
-                Bitmap bmp = BitmapFactory.decodeFile(imagePath);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.PNG, 50, stream);
-                imageAsBytes = stream.toByteArray();
-            }
 
-            Note note = new Note(imageAsBytes,
-                    data.getStringExtra("mainText"),
-                    data.getStringExtra("dateTime"),
-                    data.getIntExtra("status", 0));
-            notesAdapter.setItems(note);
-            notesAdapter.filterNotes(spinner.getSelectedItemPosition() - 1);
-        }
-        if (resultCode == Activity.RESULT_OK && requestCode == EDIT_NOTE) {
-            if(data == null) {return;}
-            final Note selectedNote = notesAdapter.getNote(selectedNotePosition);
-            selectedNote.setMainText(data.getStringExtra("mainText"));
-            selectedNote.setDateTime(data.getStringExtra("dateTime"));
-            selectedNote.setStatus(data.getIntExtra("status", 0));
-            String imagePath = data.getStringExtra("image");
-            if (imagePath != null) {
-                Bitmap bmp = BitmapFactory.decodeFile(imagePath);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.PNG, 50, stream);
-                byte[] imageAsBytes = stream.toByteArray();
-                selectedNote.setImage(imageAsBytes);
-            }
-
-            Callable<Void> clb = new Callable<Void>() {
-                @Override
-                public Void call() {
-                    App.getInstance().getDatabase().noteDao().update(selectedNote);
-                    return null;
-                }
-            };
-            Completable.fromCallable(clb)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe();
-
-            notesAdapter.notifyDataSetChanged();
-        }
-        if (resultCode == Activity.RESULT_CANCELED && requestCode == EDIT_NOTE) {
-            if(data == null) {return;}
-            Note selectedNote = notesAdapter.getNote(selectedNotePosition);
-            notesAdapter.deleteItem(selectedNote);
         }
 
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        notesAdapter.filterNotes(position - 1);
+        notesAdapter.filterAudios(position - 1);
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
-
-    /*public void GetAllMediaMp3Files(){
-
-        contentResolver = this.getContentResolver();
-
-        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        cursor = contentResolver.query(
-                uri, // Uri
-                null,
-                null,
-                null,
-                null
-        );
-
-        if (cursor == null) {
-
-            Toast.makeText(MainActivity.this,"Something Went Wrong.", Toast.LENGTH_LONG);
-
-        } else if (!cursor.moveToFirst()) {
-
-            Toast.makeText(MainActivity.this,"No Music Found on SD Card.", Toast.LENGTH_LONG);
-
-        }
-        else {
-
-            int Title = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-
-            //Getting Song ID From Cursor.
-            //int id = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
-
-            do {
-
-                // You can also get the Song ID using cursor.getLong(id).
-                //long SongID = cursor.getLong(id);
-
-                String SongTitle = cursor.getString(Title);
-
-                // Adding Media File Names to ListElementsArrayList.
-                ListElementsArrayList.add(SongTitle);
-
-            } while (cursor.moveToNext());
-        }
-    }*/
 
 
     // Creating Runtime permission function.
