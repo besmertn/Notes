@@ -21,10 +21,6 @@ public class App extends Application {
         return instance;
     }
 
-    public static void destroyInstance() {
-        instance = null;
-    }
-
     public AppDatabase getDatabase() {
         return database;
     }

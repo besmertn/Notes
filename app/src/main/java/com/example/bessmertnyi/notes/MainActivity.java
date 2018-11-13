@@ -45,28 +45,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-    @Override
-    protected void onDestroy() {
-        App.destroyInstance();
-        super.onDestroy();
-    }
-
     @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        /*db = App.getInstance().getDatabase();
-        noteDao = db.noteDao();*/
         setContentView(R.layout.activity_main);
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
         RecyclerView notesRecyclerView = findViewById(R.id.my_recycler_view);
-
-
-        // use a linear layout manager
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         notesRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -87,12 +75,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         notesRecyclerView.setAdapter(notesAdapter);
 
         spinner = findViewById(R.id.statusFilterSpinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.status_filter_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
 
         spinner.setOnItemSelectedListener(this);
@@ -150,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == CREATE_NEW_NOTE) {
             if(data == null) {return;}
             String imagePath = data.getStringExtra("image");
@@ -191,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     return null;
                 }
             };
-            //Completable.fromCallable(clb).subscribe();
             Completable.fromCallable(clb)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
