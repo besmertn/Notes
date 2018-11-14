@@ -18,8 +18,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private static final int CREATE_NEW_NOTE = 1;
@@ -27,11 +25,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private int selectedNotePosition;
     private NoteAdapter notesAdapter;
     private Spinner spinner;
+    private DatabaseHandler dbHandler;
+
+    @Override
+    protected void onDestroy() {
+        dbHandler.close();
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dbHandler = new DatabaseHandler(this);
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -56,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         };
 
-        notesAdapter = new NoteAdapter(listener, this);
+        notesAdapter = new NoteAdapter(listener, this, dbHandler);
         notesRecyclerView.setAdapter(notesAdapter);
 
         spinner = findViewById(R.id.statusFilterSpinner);
@@ -70,24 +77,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         spinner.setOnItemSelectedListener(this);
 
+        notesAdapter.clearAll();
 
-        //loadNotes();
-    }
-
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("notes", new ArrayList<>(notesAdapter.getNotes()));
-    }
-
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        Collection<Note> notes = savedInstanceState.getParcelableArrayList("notes");
-        notesAdapter.setItems(notes);
-
+        notesAdapter.setItems(dbHandler.getNotes());
     }
 
     @Override
@@ -149,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 selectedNote.setImage(imageAsBytes);
             }
 
+            dbHandler.updateNote(selectedNote);
             notesAdapter.notifyDataSetChanged();
         }
         if (resultCode == Activity.RESULT_CANCELED && requestCode == EDIT_NOTE) {

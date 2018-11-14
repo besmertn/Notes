@@ -5,7 +5,7 @@ import java.util.List;
 public interface IDatabaseHandler {
     void insertNote(Note note);
 
-    void updateNote(Note note);
+    int updateNote(Note note);
 
     void deleteNote(Note note);
 

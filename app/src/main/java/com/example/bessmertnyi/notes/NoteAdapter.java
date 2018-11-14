@@ -19,14 +19,16 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     private List<Note> values = new ArrayList<>();
     private List<Note> valuesCopy = new ArrayList<>();
 
-    NoteAdapter(OnNoteClickListener listener, Context context) {
+    NoteAdapter(OnNoteClickListener listener, Context context, DatabaseHandler dbHandler) {
         this.listener = listener;
         valuesCopy.addAll(values);
         this.context = context;
+        this.dbHandler = dbHandler;
     }
 
     private OnNoteClickListener listener;
     private Context context;
+    private DatabaseHandler dbHandler;
 
 
     class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -89,6 +91,12 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         return valuesCopy;
     }
 
+    void clearAll() {
+        valuesCopy.clear();
+        values.clear();
+        notifyDataSetChanged();
+    }
+
     void setItems(Collection<Note> notes) {
         valuesCopy.addAll(notes);
         values.addAll(notes);
@@ -98,12 +106,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     void setItems(Note note) {
         values.add(note);
         valuesCopy.add(note);
+        dbHandler.insertNote(note);
         notifyDataSetChanged();
     }
 
     void deleteItem(Note note) {
         values.remove(note);
         valuesCopy.remove(note);
+        dbHandler.deleteNote(note);
         notifyDataSetChanged();
     }
 

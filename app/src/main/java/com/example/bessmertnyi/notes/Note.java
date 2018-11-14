@@ -14,6 +14,9 @@ public class Note implements Parcelable{
     private CharSequence dateTime;
     private int status;
 
+    Note() {
+    }
+
     Note(byte[] image, CharSequence mainText, CharSequence dateTime, int status) {
         this.image = image;
         this.status = status;
@@ -39,8 +42,8 @@ public class Note implements Parcelable{
     void setMainText(CharSequence mainText) {
         this.mainText = mainText;
         String[] lines = mainText.toString().split("\r\n|\r|\n");
-        if(mainText.length() > 40 || lines.length > 2) {
-            if(lines.length > 2) {
+        if (mainText.length() > 40 || lines.length > 1) {
+            if (lines.length > 1) {
                 this.shortText = lines[0] + "\r\n" + lines[1] + "...";
             } else {
                 this.shortText = mainText.subSequence(0, 40) + "...";
@@ -73,7 +76,7 @@ public class Note implements Parcelable{
     }
 
     private Note(Parcel in) {
-        String[] data = new String[4];
+        String[] data = new String[5];
 
         in.readStringArray(data);
         // the order needs to be the same as in writeToParcel() method
