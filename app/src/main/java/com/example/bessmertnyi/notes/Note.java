@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 
 public class Note implements Parcelable{
+    private int id;
     private byte[] image;
     private CharSequence mainText;
     private CharSequence shortText;
@@ -80,6 +81,7 @@ public class Note implements Parcelable{
         this.dateTime = data[1];
         this.mainText = data[2];
         this.status = Integer.parseInt(data[3]);
+        this.id = Integer.parseInt(data[4]);
     }
 
     @Override
@@ -92,7 +94,8 @@ public class Note implements Parcelable{
         dest.writeStringArray(new String[]{Arrays.toString(this.image),
                 this.dateTime.toString(),
                 this.mainText.toString(),
-                Integer.toString(this.status)});
+                Integer.toString(this.status),
+                Integer.toString(this.id)});
     }
 
     public static final Creator<Note> CREATOR = new Creator<Note>() {
@@ -113,5 +116,13 @@ public class Note implements Parcelable{
 
     void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
